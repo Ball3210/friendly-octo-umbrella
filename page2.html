@@ -2,6 +2,23 @@
 <meta charset="utf-8">
 <style>
 
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  position: relative;
+  width: 1200px;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
 .bar {
   fill: steelblue;
 }
@@ -10,12 +27,19 @@
   fill: brown;
 }
 
-.axis--x path {
+.x.axis path {
   display: none;
 }
 
+label {
+  position: absolute;
+  top: 10px;
+  right: 500px;
+}
+
 </style>
-<svg width="960" height="500"></svg>
+<svg width="1200" height="550"></svg>
+<label><input type="checkbox"> Cases Sort in Ascending </label>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
@@ -40,19 +64,19 @@ d3.csv("data.csv", function(d) {
   y.domain([0, d3.max(data, function(d) { return d.cases; })]);
 
   g.append("g")
-      .attr("class", "axis axis--x")
+      .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x));
 
   g.append("g")
-      .attr("class", "axis axis--y")
+      .attr("class", "y axis")
       .call(d3.axisLeft(y).ticks(10))
     .append("text")
       .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", "0.71em")
+      .attr("y", -margin.left+20)
+      .attr("x", -margin.top)
       .attr("text-anchor", "end")
-      .text("cases");
+      .text("Cases");
 
   g.selectAll(".bar")
     .data(data)
@@ -91,17 +115,14 @@ function change() {
       .attr("x", function(d) { return x0(d.state); });
 
   transition.select(".x.axis")
-      .call(xAxis)
+      .call(d3.axisBottom(x))
     .selectAll("g")
       .delay(delay);
 }
 
-
     });
 
 </script>
-
-
 
 
 <h1 class="tab"> Population Distribution and Demography </h1>
