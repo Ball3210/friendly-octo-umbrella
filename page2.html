@@ -40,7 +40,7 @@ label {
 </style>
 <body>
 <svg width="1200" height="550" id="note"></svg>
-<label><input type="checkbox"> Death Number Sort in Descending </label>
+<label><input type="checkbox"> Discharge Power Sort in Descending (kW) </label>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
 <script>
@@ -56,14 +56,14 @@ var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
 var g = svg.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.csv("data2022.csv", function(d) {
-  d.deaths = +d.deaths;
+d3.csv("EV discharging time.csv", function(d) {
+  d.discharge30m = +d.discharge30m;
   return d;
 }, function(error, data) {
   if (error) throw error;
 
-  x.domain(data.map(function(d) { return d.state; }));
-  y.domain([0, d3.max(data, function(d) { return d.deaths; })]);
+  x.domain(data.map(function(d) { return d.EV; }));
+  y.domain([0, d3.max(data, function(d) { return d.discharge30m; })]);
 
   g.append("g")
       .attr("class", "x axis")
@@ -84,12 +84,12 @@ d3.csv("data2022.csv", function(d) {
     .data(data)
     .enter().append("rect")
       .attr("class", "bar")
-      .attr("x", function(d) { return x(d.state); })
-      .attr("y", function(d) { return y(d.deaths); })
+      .attr("x", function(d) { return x(d.EV); })
+      .attr("y", function(d) { return y(d.discharge30m); })
       .attr("width", x.bandwidth())
-      .attr("height", function(d) { return height - y(d.deaths); })
+      .attr("height", function(d) { return height - y(d.discharge30m); })
       .append("title") 
-	  	.text((d) => `death number: ${d.deaths}`);
+	  	.text((d) => `cases: ${d.discharge30m}`); 
 
 d3.select("input").on("change", change);
 
@@ -102,20 +102,20 @@ function change() {
 
   // Copy-on-write since tweens are evaluated after a delay.
   var x0 = x.domain(data.sort(this.checked
-      ? function(a, b) { return b.deaths - a.deaths; }
-      : function(a, b) { return d3.ascending(a.state, b.state); })
-      .map(function(d) { return d.state; }))
+      ? function(a, b) { return b.discharge30m - a.discharge30m; }
+      : function(a, b) { return d3.ascending(a.EV, b.EV); })
+      .map(function(d) { return d.EV; }))
       .copy();
 
   svg.selectAll(".bar")
-      .sort(function(a, b) { return x0(a.state) - x0(b.state); });
+      .sort(function(a, b) { return x0(a.EV) - x0(b.EV); });
 
   var transition = svg.transition().duration(750),
       delay = function(d, i) { return i * 25; };
 
   transition.selectAll(".bar")
       .delay(delay)
-      .attr("x", function(d) { return x0(d.state); });
+      .attr("x", function(d) { return x0(d.EV); });
 
   transition.select(".x.axis")
       .call(d3.axisBottom(x))
@@ -126,11 +126,11 @@ function change() {
 const annotations = [
   {
     note: {
-      label: "death > 50 k",
+      label: "discharging power > 100 kW",
       title: ""
     },
     x: margin.left,
-    y: margin.top + 2.7/7.7 * height ,
+    y: margin.top + 4/9 * height ,
     dy: 0,
     dx: 1000
   }
@@ -148,22 +148,18 @@ d3.select("#note")
 </script>
 
 
-<h1 class="tab"> 01-01-2022 US Covid Death Number by 50 States </h1>
+<h1 class="tab"> 2022 EV discharging power needed for 30 min discharging with 50% SOC removal </h1>
 
-<h3 class="tab"> Bar Chart, checkbox to select soring in descending(select) or alphabetical(unselect) </h3>
+<h3 class="tab"> Bar Chart, checkbox to select soring in decending(select) or alphabetical(unselect) </h3>
   
 <p class="tab">
-	CA has the highest Covid death number. 
-</p>
-
-<p class="tab">
-	CA, TX, FL, and NY have over 50 k Covid death numbers. 
+	add what we want to mention here 
 </p>
 
 
 <p class="tab">
-  <input type="button" onclick="location.href='index.html';" value="Back to Page 1: Cases Number" />
-  <input type="button" onclick="location.href='page3.html';" value="Continue to Page 3: Deathrate" />
+  <input type="button" onclick="location.href='index.html';" value="Back to Page 1: 1 hour discharge" />
+  <input type="button" onclick="location.href='page3.html';" value="Continue to Page 3: if your EV is Tesla" />
 </p>
 
 </body>
